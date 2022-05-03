@@ -1,11 +1,17 @@
 package main
 
-import "fuzzy/search"
+import (
+	"fmt"
+	"fuzzy/search"
+)
 
 func main() {
-	search.Search(
+	results, _ := search.Search(
 		"The house you bought is very nice",
 		[]string{"houze", "very"},
-		&search.Options{},
+		nil,
 	)
+
+	fmt.Println("The house you bought is very nice")
+	fmt.Println(results)
 }

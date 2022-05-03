@@ -1,7 +1,6 @@
 package search
 
-func LevenshteinDistance(s1, s2 string) int {
-	r1, r2 := []rune(s1), []rune(s2)
+func LevenshteinDistance(r1, r2 []rune) int {
 	n, m := len(r1), len(r2)
 
 	if n > m {
