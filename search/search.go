@@ -20,7 +20,7 @@ type Options struct {
 func DefaultOptions() *Options {
 	return &Options{
 		MatchLimit:    10,
-		DistThreshold: 2,
+		DistThreshold: 1,
 	}
 }
 
@@ -35,7 +35,7 @@ func Search(src string, patterns []string, options *Options) (map[string][]int, 
 	}
 
 	if options.MatchLimit < 0 || options.DistThreshold < 0 {
-		return nil, errors.New("invalid search options")
+		return nil, errors.New("options -m, -t must be >= 0")
 	}
 
 	text := src
@@ -118,7 +118,7 @@ func searchWorker(src []rune, patterns <-chan string, matches chan<- result, opt
 		}
 
 		if options.Reverse {
-			for i, j := 0, len(matched)-1; i < j; i, j = i+1, j+1 {
+			for i, j := 0, len(matched)-1; i < j; i, j = i+1, j-1 {
 				matched[i], matched[j] = matched[j], matched[i]
 			}
 		}
