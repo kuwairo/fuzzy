@@ -8,7 +8,7 @@ import (
 func main() {
 	results, _ := search.Search(
 		"The house you bought is very nice",
-		[]string{"houze", "very"},
+		[]string{"e", "houze", "very"},
 		nil,
 	)
 
