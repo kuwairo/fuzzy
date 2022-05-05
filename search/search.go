@@ -1,3 +1,4 @@
+// Package search contains functions for approximate string matching.
 package search
 
 import (
@@ -9,6 +10,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+// Options contains the information about search configuration.
 type Options struct {
 	InFile          bool
 	CaseInsensitive bool
@@ -17,6 +19,8 @@ type Options struct {
 	DistThreshold   int
 }
 
+// DefaultOptions returns a pointer to an instance of Options with default
+// search configuration.
 func DefaultOptions() *Options {
 	return &Options{
 		MatchLimit:    10,
@@ -24,11 +28,16 @@ func DefaultOptions() *Options {
 	}
 }
 
+// result is used internally as an intermediate container for search results.
 type result struct {
 	pattern string
 	matches []int
 }
 
+// Search performs a fuzzy search for patterns in the specified source (a string
+// or a filename with the InFile option turned on). It returns search results in
+// a map, where the key is a pattern and the value is a slice of integers
+// (indices of a pattern's first character in the source text).
 func Search(src string, patterns []string, options *Options) (map[string][]int, error) {
 	if options == nil {
 		options = DefaultOptions()
@@ -89,6 +98,9 @@ func Search(src string, patterns []string, options *Options) (map[string][]int, 
 	return matches, nil
 }
 
+// searchWorker is used internally to search for patterns supplied through the
+// string channel 'patterns'. The search is performed in the 'src' rune
+// slice. Search results are sent to the 'matches' channel.
 func searchWorker(src []rune, patterns <-chan string, matches chan<- result, options *Options) {
 	for pattern := range patterns {
 		p := []rune(pattern)
@@ -126,6 +138,10 @@ func searchWorker(src []rune, patterns <-chan string, matches chan<- result, opt
 	}
 }
 
+// newDistance calculates the Levenshtein distance between two rune slices and
+// appends it with a supplied index to the 'store' slice, but only if the
+// resulting distance is less or equal to the 'max' threshold. The 'store'
+// slice is also a return value of the function.
 func newDistance(store [][]int, r1 []rune, r2 []rune, max int, idx int) [][]int {
 	dist := LevenshteinDistance(r1, r2)
 	if dist <= max {

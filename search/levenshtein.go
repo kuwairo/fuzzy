@@ -1,5 +1,8 @@
+// Package search contains functions for approximate string matching.
 package search
 
+// LevenshteinDistance calculates the Levenshtein distance between two rune
+// slices.
 func LevenshteinDistance(r1, r2 []rune) int {
 	n, m := len(r1), len(r2)
 

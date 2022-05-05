@@ -1,3 +1,4 @@
+// Package main implements a CLI for the search package
 package main
 
 import (
