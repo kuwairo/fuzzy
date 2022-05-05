@@ -30,6 +30,7 @@ var colors = []color.Attribute{
 
 func main() {
 	src := flag.String("s", defaultSrc, "search source")
+	out := flag.String("o", "", "search results' save file")
 	patterns := flag.String("p", defaultPatterns, "search patterns")
 	inFile := flag.Bool("f", false, "in-file search")
 	caseInsensitive := flag.Bool("c", false, "case-insensitive search")
@@ -37,8 +38,6 @@ func main() {
 	matchLimit := flag.Int("m", 10, "displayed matches limit")
 	distThreshold := flag.Int("t", 1, "Levenshtein distance threshold")
 	flag.Parse()
-
-	// TODO: results output to a file
 
 	patternsSlice := strings.Split(*patterns, " ")
 
@@ -58,6 +57,7 @@ func main() {
 	}
 
 	var text []rune
+	var output strings.Builder
 	rand.Seed(time.Now().UnixNano())
 
 	if *inFile {
@@ -72,9 +72,11 @@ func main() {
 	}
 
 	for pattern, matches := range results {
-		fmt.Printf("`%s` matches:\n", pattern)
+		output.WriteString(
+			fmt.Sprintf("`%s` matches:\n", pattern),
+		)
 		if len(matches) < 1 {
-			fmt.Printf("No matches found\n\n")
+			output.WriteString("No matches found\n\n")
 			continue
 		}
 
@@ -88,13 +90,25 @@ func main() {
 			colorIdx := rand.Intn(len(colors) - 1)
 			pColor := color.New(colors[colorIdx])
 
-			fmt.Printf(
+			result := fmt.Sprintf(
 				"%s%s%s\n",
 				string(text[:idx]),
 				pColor.Sprint(string(text[idx:pEnd])),
 				string(text[pEnd:]),
 			)
+			output.WriteString(result)
 		}
-		fmt.Println()
+		output.WriteString("\n")
+	}
+
+	outputString := output.String()
+	fmt.Printf("%s", outputString)
+
+	if len(*out) > 0 {
+		data := []byte(outputString)
+		err := os.WriteFile(*out, data, 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
